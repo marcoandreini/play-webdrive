@@ -16,7 +16,7 @@
   limitations under the License.
 */
 
-package play.modules.webdrive;
+package play.modules.webtest;
 
 import java.io.BufferedReader;
 import java.io.File;

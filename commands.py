@@ -18,20 +18,23 @@
 import subprocess
 import urllib2
 
+import os.path
+
 from play.utils import *
 
-COMMANDS = [ 'webdrive:test' ]
+COMMANDS = [ 'webtest:test' ]
 
 HELP = {
-    'webdrive:test': 'Run tests using Selenium 2 WebDriver'
+    'webtest:test': 'Run tests using Selenium 2 WebDriver'
 }
 
 def execute(**kargs):
     command = kargs.get("command")
+    play_env = kargs.get("env")
     app = kargs.get("app")
     args = kargs.get("args")
 
-    if command == 'webdrive:test':
+    if command == 'webtest:test':
         test(app, args)
 
 def test(app, args):
@@ -41,7 +44,7 @@ def test(app, args):
     if not isTestFrameworkId(app.play_env["id"]): 
         app.play_env["id"] = 'test'
 
-    print "~ Running tests with webdriver"
+    print "~ Running tests with webtest"
     print "~ Ctrl+C to stop"
     print "~ "
 
@@ -49,14 +52,15 @@ def test(app, args):
     if os.path.exists(os.path.join(app.path, 'tmp')):
         shutil.rmtree(os.path.join(app.path, 'tmp'))
     print "~"
+    
+    # overwrite app with a new one, setting id to test
+    from play.application import PlayApplication
+    app = PlayApplication(app.path, app.play_env, app.ignoreMissingModules)
 
     # Kill if exists
     http_port = 9000
     protocol = 'http'
-    if app.readConf('https.port'):
-        http_port = app.readConf('https.port')
-        protocol = 'https'
-    else:
+    if app.readConf('http.port'):
         http_port = app.readConf('http.port')
     try:
         proxy_handler = urllib2.ProxyHandler({})
@@ -101,7 +105,7 @@ def test(app, args):
     	'-Dwebdrive.classes=%s' % app.readConf('webdrive.classes'),
     	'-Dwebdrive.timeout=%s' % app.readConf('webdrive.timeout'),
     	'-Dapplication.url=%s://localhost:%s' % (protocol, http_port),
-    	'play.modules.webdrive.WebDriverRunner']
+    	'play.modules.webtest.WebDriverRunner']
     try:
         subprocess.call(java_cmd, env=os.environ)
     except OSError:

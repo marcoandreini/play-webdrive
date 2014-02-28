@@ -16,20 +16,23 @@
   limitations under the License.
 */
 
-package play.modules.webdrive;
+package play.modules.webtest;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import io.selendroid.SelendroidDriver;
+
 import java.util.List;
 import java.util.Map;
 
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.android.AndroidDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
-import org.openqa.selenium.iphone.IPhoneDriver;
+import org.openqa.selenium.phantomjs.PhantomJSDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 
 /**
  * Manages {@link WebDriver} instances to use for testing.
@@ -38,21 +41,21 @@ public class DriverManager {
 
 	/* Drivers can be specified with their simple names - ie, firefox, etc */
 	private static final Map<String, Class<? extends WebDriver>> simpleDriverNames =
-		new HashMap<String, Class<? extends WebDriver>>();
-	static {
-		simpleDriverNames.put("htmlunit", HtmlUnitDriver.class);
-		simpleDriverNames.put("android", AndroidDriver.class);
-		simpleDriverNames.put("chrome", ChromeDriver.class);
-		simpleDriverNames.put("firefox", FirefoxDriver.class);
-		simpleDriverNames.put("ie", InternetExplorerDriver.class);
-		simpleDriverNames.put("iphone", IPhoneDriver.class);
-	}
+		ImmutableMap.<String, Class<? extends WebDriver>>builder()
+		.put("htmlunit", HtmlUnitDriver.class)
+		.put("android", SelendroidDriver.class)
+		.put("chrome", ChromeDriver.class)
+		.put("firefox", FirefoxDriver.class)
+		.put("ie", InternetExplorerDriver.class)
+		.put("phantomjs", PhantomJSDriver.class)
+		.put("remote", RemoteWebDriver.class)
+		.build();
 
 	/**
 	 * Returns the list of all {@link WebDriver} classes to run tests.
 	 */
 	public List<Class<?>> getDriverClasses() {
-		List<Class<?>> drivers = new ArrayList<Class<?>>();
+		List<Class<?>> drivers = Lists.newArrayList();
 		String driversProp = System.getProperty("webdrive.classes");
 		if (driversProp == null || driversProp.trim().isEmpty()) {
 			return drivers;

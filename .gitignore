@@ -1,3 +1,7 @@
 dist
 tmp
 lib
+bin
+.settings
+.project
+.classpath
